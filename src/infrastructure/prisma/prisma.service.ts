@@ -6,11 +6,19 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  onModuleInit() {
-    this.$connect();
+  async onModuleInit() {
+    try {
+      await this.$connect();
+    } catch (error) {
+      throw new Error(`Database connection error: ${error}`);
+    }
   }
 
-  onModuleDestroy() {
-    this.$disconnect();
+  async onModuleDestroy() {
+    try {
+      await this.$disconnect();
+    } catch (error) {
+      throw new Error(`Database disconnection error: ${error}`);
+    }
   }
 }
