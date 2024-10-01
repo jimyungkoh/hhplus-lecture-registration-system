@@ -12,7 +12,7 @@ datasource db {
 }
 
 model Lecture {
-  id         String @id @default(uuid())
+  id         String @id @default(cuid())
   title      String
   instructor String
 
@@ -22,7 +22,7 @@ model Lecture {
   currentRegistrations Int @default(0)
 
   hostId String
-  host   User   @relation("HostedLectures", fields: [hostId], references: [id])
+  host   User   @relation("UserHostedLectures", fields: [hostId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -33,27 +33,27 @@ model Lecture {
 }
 
 model Registration {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   lectureId String
   lecture   Lecture @relation(fields: [lectureId], references: [id])
 
-  guestId String
-  guest   User   @relation("GuestRegistrations", fields: [guestId], references: [id])
+  userId String
+  user   User   @relation("UserRegistrations", fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
 
-  @@unique([guestId, lectureId])
-  @@index([lectureId, guestId])
+  @@unique([userId, lectureId])
+  @@index([lectureId, userId])
 }
 
 model User {
-  id   String @id @default(uuid())
+  id   String @id @default(cuid())
   name String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  registrations  Registration[] @relation("GuestRegistrations")
-  hostedLectures Lecture[]      @relation("HostedLectures")
+  registrations  Registration[] @relation("UserRegistrations")
+  hostedLectures Lecture[]      @relation("UserHostedLectures")
 }
