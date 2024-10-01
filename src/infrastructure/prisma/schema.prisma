@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+/// @prisma-schema-folder src/infrastructure/prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lecture {
+  id         String @id @default(uuid())
+  title      String
+  instructor String
+
+  date DateTime
+
+  capacity             Int @default(30)
+  currentRegistrations Int @default(0)
+
+  hostId String
+  host   User   @relation("HostedLectures", fields: [hostId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  registrations Registration[]
+
+  @@index([date])
+}
+
+model Registration {
+  id String @id @default(uuid())
+
+  lectureId String
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
+
+  guestId String
+  guest   User   @relation("GuestRegistrations", fields: [guestId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([guestId, lectureId])
+  @@index([lectureId, guestId])
+}
+
+model User {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  registrations  Registration[] @relation("GuestRegistrations")
+  hostedLectures Lecture[]      @relation("HostedLectures")
+}
