@@ -27,13 +27,13 @@ describe('LectureManager', () => {
   });
 
   /**
-   * checkLectureExists 메소드에 대한 테스트
+   * verifyLectureExistence 메소드에 대한 테스트
    * 이 메소드는 주어진 ID로 강의를 찾고, 찾지 못한 경우 예외를 발생시키는 기능을 테스트합니다.
    */
-  describe('checkLectureExists', () => {
+  describe('verifyLectureExistence', () => {
     /**
      * 테스트 케이스: 강의를 찾았을 때 아무 일도 일어나지 않아야 함
-     * 목적: checkLectureExists 메소드가 존재하는 강의 ID로 호출되었을 때,
+     * 목적: verifyLectureExistence 메소드가 존재하는 강의 ID로 호출되었을 때,
      *       아무런 예외도 발생하지 않는지 확인합니다.
      */
     test('강의를 찾았을 때 아무 일도 일어나지 않아야 함', async () => {
@@ -53,7 +53,10 @@ describe('LectureManager', () => {
       prismaService.lecture.findUnique.mockResolvedValue(lectureStub);
 
       // when
-      const resultPromise = lectureManager.checkLectureExists('1', undefined);
+      const resultPromise = lectureManager.verifyLectureExistence(
+        '1',
+        undefined,
+      );
 
       // then
       await expect(resultPromise).resolves.not.toThrow();
@@ -61,7 +64,7 @@ describe('LectureManager', () => {
 
     /**
      * 테스트 케이스: 강의를 찾지 못했을 때 LectureNotFoundException을 throw하는지 테스트
-     * 목적: checkLectureExists 메소드가 존재하지 않는 강의 ID로 호출되었을 때,
+     * 목적: verifyLectureExistence 메소드가 존재하지 않는 강의 ID로 호출되었을 때,
      *       적절한 예외(LectureNotFoundException)를 발생시키는지 확인합니다.
      */
     test('강의를 찾지 못했을 때 LectureNotFoundException을 발생시켜야 함', async () => {
@@ -69,7 +72,10 @@ describe('LectureManager', () => {
       prismaService.lecture.findUnique.mockResolvedValue(null);
 
       // when
-      const resultPromise = lectureManager.checkLectureExists('1', undefined);
+      const resultPromise = lectureManager.verifyLectureExistence(
+        '1',
+        undefined,
+      );
 
       // then
       await expect(resultPromise).rejects.toThrow(LectureNotFoundException);

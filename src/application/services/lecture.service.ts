@@ -34,7 +34,7 @@ export class LectureService {
   ): Promise<RegistrationVo> {
     return await this.prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        await this.lectureManager.checkLectureExists(lectureId, tx);
+        await this.lectureManager.verifyLectureExistence(lectureId, tx);
         await this.registrationManager.checkRegistrationAvailability(
           lectureId,
           userId,

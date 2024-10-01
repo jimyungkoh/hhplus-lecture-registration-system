@@ -15,7 +15,7 @@ export class LectureManager {
    * @throws {LectureNotFoundException} 강의를 찾을 수 없는 경우
    * @returns {Promise<void>}
    */
-  async checkLectureExists(
+  async verifyLectureExistence(
     lectureId: string,
     tx?: Prisma.TransactionClient,
   ): Promise<void> {
@@ -34,14 +34,15 @@ export class LectureManager {
 
   /**
    * 사용 가능한 강의 조회
-   * @param {string} dateString - 날짜 문자열
+   * 사용 가능한 강의: 현재 등록 인원이 수용 인원보다 적은 강의
+   * @param {string} dateString - 날짜 문자열 (YYYY-MM-DD 형식)
    * @returns {Promise<AvailableLectureVo[]>} 사용 가능한 강의 목록
    */
   async findAvailableLectures(
     dateString: string,
   ): Promise<AvailableLectureVo[]> {
     const { startOfDate, endOfDate } = this.getDateRange(dateString);
-    const lectures = await this.findLecturesWithCount(startOfDate, endOfDate);
+    const lectures = await this.findLectures(startOfDate, endOfDate);
 
     return lectures
       .filter((lecture) => lecture.capacity > lecture.currentRegistrations)
@@ -65,7 +66,7 @@ export class LectureManager {
    * @returns {Promise<Lecture[]>} 강의 목록
    * @private
    */
-  private async findLecturesWithCount(
+  private async findLectures(
     startOfDate: Date,
     endOfDate: Date,
   ): Promise<Lecture[]> {
@@ -81,7 +82,7 @@ export class LectureManager {
 
   /**
    * 날짜 범위 계산
-   * @param {string} dateString - 날짜 문자열
+   * @param {string} dateString - 날짜 문자열 (YYYY-MM-DD 형식)
    * @returns {{ startOfDate: Date; endOfDate: Date }} 시작 날짜와 종료 날짜
    * @private
    */
@@ -90,6 +91,7 @@ export class LectureManager {
     endOfDate: Date;
   } {
     const date = new Date(dateString);
+
     return {
       startOfDate: new Date(date.setHours(0, 0, 0, 0)),
       endOfDate: new Date(date.setHours(23, 59, 59, 999)),
