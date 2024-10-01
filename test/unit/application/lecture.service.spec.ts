@@ -77,7 +77,7 @@ describe('LectureService', () => {
         throw new Error('Invalid argument type for $transaction');
       });
 
-      lectureManager.checkLectureExists.mockResolvedValue(undefined);
+      lectureManager.verifyLectureExistence.mockResolvedValue(undefined);
       registrationManager.checkRegistrationAvailability.mockResolvedValue(
         undefined,
       );
@@ -89,7 +89,7 @@ describe('LectureService', () => {
       // then
       expect(result).toEqual(registrationStub);
       expect(prismaService.$transaction).toHaveBeenCalled();
-      expect(lectureManager.checkLectureExists).toHaveBeenCalledWith(
+      expect(lectureManager.verifyLectureExistence).toHaveBeenCalledWith(
         lectureId,
         prismaService,
       );

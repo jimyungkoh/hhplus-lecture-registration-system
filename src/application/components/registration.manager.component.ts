@@ -57,7 +57,6 @@ export class RegistrationManager {
         `[사용자 ID]: ${userId}는 이미 [강의 ID]: ${lectureId}에 등록되어 있습니다`,
       );
   }
-
   /**
    * 강의 등록
    * @param {string} userId - 사용자 ID
@@ -72,17 +71,36 @@ export class RegistrationManager {
   ): Promise<RegistrationVo> {
     const client = tx ?? this.prisma;
 
-    const [_, registration] = await Promise.all([
-      client.lecture.update({
-        where: { id: lectureId },
-        data: { currentRegistrations: { increment: 1 } },
-      }),
-      client.registration.create({
-        data: { userId, lectureId },
-      }),
-    ]);
+    // 트랜잭션 로직 분리
+    const executeTransaction = async (
+      transactionClient: Prisma.TransactionClient | PrismaService,
+    ) => {
+      const [_, newRegistration] = await Promise.all([
+        transactionClient.lecture.update({
+          where: { id: lectureId },
+          data: { currentRegistrations: { increment: 1 } },
+        }),
+        transactionClient.registration.create({
+          data: { userId, lectureId },
+        }),
+      ]);
 
-    return registration;
+      return newRegistration;
+    };
+
+    // 트랜잭션 실행 및 결과 반환
+    const newRegistration =
+      client instanceof PrismaService
+        ? await client.$transaction(executeTransaction)
+        : await executeTransaction(client);
+
+    // RegistrationVo 객체 생성 및 반환
+    return new RegistrationVo(
+      newRegistration.id,
+      newRegistration.userId,
+      newRegistration.lectureId,
+      newRegistration.createdAt,
+    );
   }
 
   /**
