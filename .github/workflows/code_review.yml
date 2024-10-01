@@ -19,8 +19,8 @@ jobs:
           # Optional: Add your own API key
           LANGUAGE: Korean
           OPENAI_API_ENDPOINT: https://api.openai.com/v1
-          MODEL: gpt-4o-mini # https://platform.openai.com/docs/models
-          PROMPT: # example: Please check if there are any confusions or irregularities in the following code diff:
+          MODEL: o1-mini # https://platform.openai.com/docs/models
+          # PROMPT: # example: Please check if there are any confusions or irregularities in the following code diff:
           top_p: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-top_p
           temperature: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-temperature
           max_tokens: 10000

@@ -4,6 +4,7 @@ import { ApplicationModule } from './application/application.module';
 import { PresentationModule } from './presentation/presentation.module';
 
 @Module({
+  imports: [InfrastructureModule, ApplicationModule, PresentationModule],
   controllers: [],
   providers: [],
 })
