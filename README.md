@@ -203,4 +203,4 @@ Snapshots:   0 total
 Time:        3.135 s
 ```
 
-## STEP 3 & 4
+## STEP 3 & 4 통합 테스트 결과
