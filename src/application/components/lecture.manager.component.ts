@@ -20,9 +20,9 @@ export class LectureManager {
     tx?: Prisma.TransactionClient,
   ): Promise<void> {
     const client = tx ?? this.prisma;
-
     const lecture = await client.lecture.findUnique({
       where: { id: lectureId },
+      select: { id: true },
     });
 
     if (!lecture) {

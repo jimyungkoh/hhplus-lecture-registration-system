@@ -1,9 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-/// @prisma-schema-folder src/infrastructure/prisma
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "linux-musl"]
 }
 
 datasource db {
@@ -12,48 +9,39 @@ datasource db {
 }
 
 model Lecture {
-  id         String @id @default(cuid())
-  title      String
-  instructor String
+  id                   String         @id @default(cuid())
+  title                String
+  instructor           String
+  date                 DateTime
+  capacity             Int            @default(30)
+  currentRegistrations Int            @default(0)
+  hostId               String
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  host                 User           @relation("UserHostedLectures", fields: [hostId], references: [id])
+  registrations        Registration[]
 
-  date DateTime
-
-  capacity             Int @default(30)
-  currentRegistrations Int @default(0)
-
-  hostId String
-  host   User   @relation("UserHostedLectures", fields: [hostId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  registrations Registration[]
-
+  @@index([currentRegistrations])
   @@index([date])
 }
 
 model Registration {
-  id String @id @default(cuid())
-
+  id        String   @id @default(cuid())
   lectureId String
-  lecture   Lecture @relation(fields: [lectureId], references: [id])
-
-  userId String
-  user   User   @relation("UserRegistrations", fields: [userId], references: [id])
-
+  userId    String
   createdAt DateTime @default(now())
+  user      User     @relation("UserRegistrations", fields: [userId], references: [id])
+  lecture   Lecture  @relation(fields: [lectureId], references: [id])
 
   @@unique([userId, lectureId])
   @@index([lectureId, userId])
 }
 
 model User {
-  id   String @id @default(cuid())
-  name String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  registrations  Registration[] @relation("UserRegistrations")
+  id             String         @id @default(cuid())
+  name           String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   hostedLectures Lecture[]      @relation("UserHostedLectures")
+  registrations  Registration[] @relation("UserRegistrations")
 }
