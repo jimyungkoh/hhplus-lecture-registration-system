@@ -7,14 +7,19 @@ import {
   RegisteredLectureVo,
   RegistrationVo,
 } from 'src/domain/value-objects';
+import { RegistrationFailException } from '../exceptions/registration-fail.exception';
+import { Mutex } from 'async-mutex';
 
 @Injectable()
 export class LectureService {
+  private readonly mutex: Mutex;
   constructor(
     private readonly prisma: PrismaService,
     private readonly lectureManager: LectureManager,
     private readonly registrationManager: RegistrationManager,
-  ) {}
+  ) {
+    this.mutex = new Mutex();
+  }
 
   /**
    * 특정 userId로 특강 신청
@@ -26,6 +31,9 @@ export class LectureService {
   async registerForLecture(
     userId: string,
     lectureId: string,
+    maxRetries = 5,
+    baseDelay = 1_000,
+    maxDelay = 60_000,
   ): Promise<RegistrationVo> {
     return await this.prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
